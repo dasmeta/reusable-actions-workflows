@@ -1,0 +1,111 @@
+name: Plan / Test On PR 
+
+on:
+  pull_request:
+    branches:
+      - release
+    paths-ignore:
+      - 'terraform/aws/**'
+      - 'terraform/base/**'
+      - 'terraform/infrastructure/**'
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        path:
+          - pushmetrics.io
+          - query.me
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+
+      - uses: marceloprado/has-changed-path@v1
+        id: changed
+        with:
+          paths: terraform/${{ matrix.path }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Initialize Terraform
+        if: steps.changed.outputs.changed == 'true'
+        continue-on-error: true
+        run: |
+          cd terraform/${{ matrix.path }}
+          terraform init -backend="true" -backend-config="backend_prod.hcl" 
+
+      - name: Plan Terraform
+        if: steps.changed.outputs.changed == 'true'
+        id: plan
+        continue-on-error: true
+        run: |
+          cd terraform/${{ matrix.path }}
+          terraform plan -var-file="prod.tfvars" -no-color -out=plan.tfplan \
+          && terraform show -no-color plan.tfplan
+
+      - run: echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
+
+      - uses: actions/upload-artifact@v2
+        if: steps.changed.outputs.changed == 'true'
+        with:
+          name: ${{ matrix.path }}
+          path: plan.txt
+
+  post_plan:
+    name: Post Plan
+    needs: [plan]
+    runs-on: ubuntu-20.04
+    permissions: write-all
+
+    steps:
+      - name: Download Plan Outputs
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+
+      - name: Put Plan Files in ENV Vars
+        continue-on-error: true
+        run: |
+          PUSHMETRICS_PLAN=$(cat pushmetrics.io/plan.txt)
+          echo "PUSHMETRICS_PLAN<<EOF" >> $GITHUB_ENV
+          echo "$PUSHMETRICS_PLAN" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          QUERYME_PLAN=$(cat query.me/plan.txt)
+          echo "QUERYME_PLAN<<EOF" >> $GITHUB_ENV
+          echo "$QUERYME_PLAN" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      
+      - name: Post Plan to GitHub PR
+        continue-on-error: true
+        uses: mshick/add-pr-comment@v1
+        with:
+          allow-repeats: true
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ## PUSHMETRICS
+            ```diff
+            ${{ env.PUSHMETRICS_PLAN }}
+            ```
+            -----
+            ## QUERYME
+            ```diff
+            ${{ env.QUERYME_PLAN }}
+            ```
+            -----
+            Merge to master to apply all of the above
+            
+            

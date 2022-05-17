@@ -1,0 +1,32 @@
+name: Plan / Test On PR 
+
+on:
+  pull_request:
+    branches:
+      - master
+jobs:  
+  plan:
+    name: Plan
+    runs-on: ubuntu-20.04
+    permissions: write-all
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKE}}
+    strategy:
+      matrix:
+        path: N 
+          - pushmetrics.io
+          - query.me
+    steps:
+      - name: Publish PR comment from terraform plan
+        uses: 0katrinpetrosyan0/Publish-to-marketplace@v2.6
+        with:
+          fetch-depth: 100
+          paths: terraform/${{ matrix.path }}
+          path: ${{ matrix.path }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRETE_ID }}
+          backend: true
+          backend-config: backend_stage.hcl 
+          var-file: stage.tfvars
+        
