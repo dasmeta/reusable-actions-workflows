@@ -11,12 +11,12 @@ jobs:
     permissions: write-all
     strategy:
       matrix:
-        path: N 
+        path: 
           - pushmetrics.io
           - query.me
     steps:
-      - name: Publish PR comment from terraform plan
-        uses: 0katrinpetrosyan0/Publish-to-marketplace@v2.6
+      - name: Publish terraform plan result into PR
+        uses: dasmeta/reusable-actions-workflows@0.1.1
         with:
           fetch-depth: 100
           paths: terraform/${{ matrix.path }}
@@ -25,6 +25,5 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRETE_ID }}
           backend: true
-          backend-config: backend_stage.hcl 
-          var-file: stage.tfvars
-        
+          backend-config: backend_prod.hcl 
+          var-file: prod.tfvars
