@@ -49,15 +49,15 @@ Optional. Uses to comment on PRs.
 
 `fetch-depth`
 Optional. Number of commits to fetch. 0 indicates all history for all branches and tags.
-Default: 100
+`Default: 100`
 
 `paths`
 Optional. Relative path under repository.
-Default: terraform 
+`Default: terraform `
 
 `aws-region`
 Optional. 'AWS Region, e.g. us-east-2'
-Default: us-east-1
+`Default: us-east-1`
 
 `aws-access-key-id:` 
 Optional. AWS Access Key ID. This input is required if running in the GitHub hosted environment.
@@ -67,19 +67,19 @@ Optional. AWS Secret Access Key. This input is required if running in the GitHub
 
 `path`
 Optional. This is for file that plan will redirect into it like plan.txt
-Default: folder1
+`Default: folder1`
 
 `backend`
 Optional. Disable or Enable Backend
-Default: false
+`Default: false`
 
 `backend-config`
 Optional. Configuration to be merged with what is in the configuration file's 'backend' block.
-Default: "backend.hcl"
+`Default: "backend.hcl"`
 
 `var-file`
 Optional. Variable file
-Default: "env.tfvars"
+`Default: "env.tfvars"`
 
 
 ## EXAMPLE FOR NOT Default configuration:
