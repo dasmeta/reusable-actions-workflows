@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - pushmetrics.io
-          - query.me
+          - project1
+          - project2
     steps:
       - name: Check out code
         uses: actions/checkout@v2

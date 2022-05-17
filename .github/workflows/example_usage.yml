@@ -9,8 +9,6 @@ jobs:
     name: Plan
     runs-on: ubuntu-20.04
     permissions: write-all
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKE}}
     strategy:
       matrix:
         path: N 

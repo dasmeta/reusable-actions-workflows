@@ -4,10 +4,6 @@ on:
   pull_request:
     branches:
       - master
-    paths-ignore:
-      - 'terraform/aws/**'
-      - 'terraform/base/**'
-      - 'terraform/infrastructure/**'
 
 jobs:
   plan:
@@ -17,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         path:
-          - pushmetrics.io
-          - query.me
+          - project1
+          - project2
 
     steps:
       - name: Check out code
@@ -79,13 +75,13 @@ jobs:
       - name: Put Plan Files in ENV Vars
         continue-on-error: true
         run: |
-          PUSHMETRICS_PLAN=$(cat pushmetrics.io/plan.txt)
-          echo "PUSHMETRICS_PLAN<<EOF" >> $GITHUB_ENV
-          echo "$PUSHMETRICS_PLAN" >> $GITHUB_ENV
+          PLAN1=$(cat project1/plan.txt)
+          echo "PLAN1<<EOF" >> $GITHUB_ENV
+          echo "$PLAN1" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          QUERYME_PLAN=$(cat query.me/plan.txt)
-          echo "QUERYME_PLAN<<EOF" >> $GITHUB_ENV
-          echo "$QUERYME_PLAN" >> $GITHUB_ENV
+          PLAN2=$(cat project2/plan.txt)
+          echo "PLAN2<<EOF" >> $GITHUB_ENV
+          echo "$PLAN2" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       
       - name: Post Plan to GitHub PR
@@ -96,14 +92,14 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           message: |
-            ## PUSHMETRICS
+            ## Plan1
             ```diff
-            ${{ env.PUSHMETRICS_PLAN }}
+            ${{ env.PLAN1 }}
             ```
             -----
-            ## QUERYME
+            ## Plan2
             ```diff
-            ${{ env.QUERYME_PLAN }}
+            ${{ env.PLAN2 }}
             ```
             -----
             Merge to master to apply all of the above

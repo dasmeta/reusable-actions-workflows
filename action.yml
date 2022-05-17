@@ -15,7 +15,7 @@ inputs:
   paths:
     description: "Relative path under repo"
     required: false
-    default: .
+    default: terraform
   aws-region: 
     description: "AWS Region, e.g. us-east-2"
     required: false
@@ -29,15 +29,19 @@ inputs:
   path:
     description: "This is for file that plan will redirect into it like plan.txt"
     required: false
+    default: folder1
   backend:
     description: "Disable or Enable Backend"
     required: false
+    default: "false"
   backend-config:
     description: "Configuration to be merged with what is in the configuration file's 'backend' block."
     required: false
+    default: "backend.hcl"
   var-file:
     description: "Variable file"
     required: false
+    default: "env.tfvars"
 runs:
   using: "composite"
   steps:
