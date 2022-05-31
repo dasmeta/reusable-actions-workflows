@@ -12,10 +12,6 @@ inputs:
     description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
     required: false
     default: ""
-  paths:
-    description: "Relative path under repo"
-    required: false
-    default: terraform
   aws-region: 
     description: "AWS Region, e.g. us-east-2"
     required: false
@@ -57,7 +53,7 @@ runs:
     - uses: marceloprado/has-changed-path@v1
       id: changed
       with:
-        paths: ${{ inputs.paths }}
+        paths: ${{ inputs.path }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -77,7 +73,7 @@ runs:
         pwd
         ls -hla
         echo $PWD
-        cd ${{ inputs.paths }}
+        cd ${{ inputs.path }}
         terraform init -backend="${{inputs.backend}}" -backend-config="${{inputs.backend-config}}"
       shell: bash
 
@@ -85,7 +81,7 @@ runs:
       id: plan
       # continue-on-error: true
       run: |
-        cd ${{ inputs.paths }}
+        cd ${{ inputs.path }}
         terraform plan -var-file="${{inputs.var-file}}" -no-color -out=plan.tfplan \
         && terraform show -no-color plan.tfplan
       shell: bash
