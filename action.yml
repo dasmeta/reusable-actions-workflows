@@ -113,7 +113,7 @@ runs:
       shell: bash
 
     - name: Post Plan to GitHub PR
-      if: ${{inputs.post-plan-to-github-pr}} == 'true'
+      if: ${{inputs.post-plan-to-github-pr == 'true'}}
       # continue-on-error: true
       uses: mshick/add-pr-comment@v1
       with:
