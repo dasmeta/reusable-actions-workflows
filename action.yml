@@ -11,7 +11,7 @@ inputs:
   fetch-depth: 
     description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
     required: false
-    default: 100
+    default: ""
   paths:
     description: "Relative path under repo"
     required: false
@@ -74,6 +74,9 @@ runs:
     - name: Initialize Terraform
       # continue-on-error: true
       run: |
+        pwd
+        ls -hla
+        echo $PWD
         cd ${{ inputs.paths }}
         terraform init -backend="${{inputs.backend}}" -backend-config="${{inputs.backend-config}}"
       shell: bash
