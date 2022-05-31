@@ -91,8 +91,8 @@ runs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{inputs.path}}
-        path: plan.tfplan
+        name: plan.tfplan
+        path: ${{inputs.path}}/plan.tfplan
 
     # - uses: actions/upload-artifact@v2
     #   with:
