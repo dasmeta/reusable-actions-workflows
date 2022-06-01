@@ -1,5 +1,5 @@
-name: Publish terraform plan result into PR
-description: "Helo Publish PR comment in Marketplacee from terraform plan"
+name: Terraform plan, publish plan result into PR and apply steps
+description: "terraform tool common flow action to plan, publish plan into PR comment and apply result"
 author: Das Meta
 branding:
   icon: globe
@@ -11,11 +11,7 @@ inputs:
   fetch-depth: 
     description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
     required: false
-    default: 100
-  paths:
-    description: "Relative path under repo"
-    required: false
-    default: terraform
+    default: ""
   aws-region: 
     description: "AWS Region, e.g. us-east-2"
     required: false
@@ -42,6 +38,14 @@ inputs:
     description: "Variable file"
     required: false
     default: "env.tfvars"
+  post-plan-to-github-pr:
+    description: "Allows to disable plan result posting into github PR as comment"
+    required: false
+    default: "true"
+  do-apply:
+    description: "Allows to enable plan result direct apply"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -53,7 +57,7 @@ runs:
     - uses: marceloprado/has-changed-path@v1
       id: changed
       with:
-        paths: ${{ inputs.paths }}
+        paths: ${{ inputs.path }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -63,38 +67,31 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
 
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.2.1
 
     - name: Initialize Terraform
-      continue-on-error: true
       run: |
-        cd ${{ inputs.paths }}
+        pwd
+        ls -hla
+        echo $PWD
+        cd ${{ inputs.path }}
         terraform init -backend="${{inputs.backend}}" -backend-config="${{inputs.backend-config}}"
       shell: bash
 
     - name: Plan Terraform
       id: plan
-      continue-on-error: true
       run: |
-        cd ${{ inputs.paths }}
+        cd ${{ inputs.path }}
         terraform plan -var-file="${{inputs.var-file}}" -no-color -out=plan.tfplan \
         && terraform show -no-color plan.tfplan
       shell: bash
 
-    - run: echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > plan.txt
+    - run: echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > ${{inputs.path}}/plan.txt
       shell: bash
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: ${{inputs.path}}
-        path: plan.txt
-
-    - name: Download Plan Outputs
-      continue-on-error: true
-      uses: actions/download-artifact@v2
-
     - name: Put Plan Files in ENV Vars
-      continue-on-error: true
       run: |
         PLAN=$(cat ${{inputs.path}}/plan.txt)
         echo "PLAN<<EOF" >> $GITHUB_ENV
@@ -103,7 +100,7 @@ runs:
       shell: bash
 
     - name: Post Plan to GitHub PR
-      continue-on-error: true
+      if: ${{inputs.post-plan-to-github-pr == 'true'}}
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ inputs.github-token }}
@@ -116,4 +113,12 @@ runs:
             ${{ env.PLAN }}
             ```
             
-            Merge to master to apply all of the above
+            Merge to apply all of the above
+
+    - name: Apply Terraform
+      if: ${{inputs.do-apply == 'true'}}
+      id: apply
+      run: |
+        cd ${{ inputs.path }}
+        terraform apply -input=false plan.tfplan
+      shell: bash
