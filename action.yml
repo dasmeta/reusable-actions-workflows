@@ -42,6 +42,10 @@ inputs:
     description: "Allows to disable plan result posting into github PR as comment"
     required: false
     default: "true"
+  do-apply:
+    description: "Allows to enable plan result direct apply"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -89,22 +93,12 @@ runs:
     - run: echo '${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > ${{inputs.path}}/plan.txt
       shell: bash
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: ${{inputs.path}}/plan.tfplan
-        path: ${{inputs.path}}/plan.tfplan
-
     # - uses: actions/upload-artifact@v2
     #   with:
-    #     name: ${{inputs.path}}
-    #     path: plan.txt
-
-    # - name: Download Plan Outputs
-    #   continue-on-error: true
-    #   uses: actions/download-artifact@v2
+    #     name: ${{inputs.path}}/plan.tfplan
+    #     path: ${{inputs.path}}/plan.tfplan
 
     - name: Put Plan Files in ENV Vars
-      # continue-on-error: true
       run: |
         PLAN=$(cat ${{inputs.path}}/plan.txt)
         echo "PLAN<<EOF" >> $GITHUB_ENV
@@ -114,7 +108,6 @@ runs:
 
     - name: Post Plan to GitHub PR
       if: ${{inputs.post-plan-to-github-pr == 'true'}}
-      # continue-on-error: true
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ inputs.github-token }}
@@ -128,3 +121,11 @@ runs:
             ```
             
             Merge to master to apply all of the above
+
+    - name: Apply Terraform
+      if: ${{inputs.do-apply == 'true'}}
+      id: apply
+      run: |
+        cd ${{ inputs.path }}
+        terraform apply -var-file="${{inputs.var-file}}" -no-color plan.tfplan
+      shell: bash
