@@ -127,5 +127,5 @@ runs:
       id: apply
       run: |
         cd ${{ inputs.path }}
-        terraform apply -var-file="${{inputs.var-file}}" -no-color plan.tfplan
+        terraform apply -input=false plan.tfplan
       shell: bash
