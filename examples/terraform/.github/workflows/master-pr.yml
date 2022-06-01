@@ -1,0 +1,36 @@
+name: Plan stage On PR
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+    branches:
+      - master
+    paths:
+      - 'terraform/project1/**'
+      - 'terraform/project2/**'
+jobs:
+  plan:
+    name: Plan stage and publish/comment result into PR
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        path:
+          - project1
+          - project2
+    steps:
+      - name: Publish stage terraform plan result into PR
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.0
+        with:
+          post-plan-to-github-pr: 'true'
+          fetch-depth: 100
+          path: terraform/${{ matrix.path }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          backend: true
+          backend-config: stage.tfbackend
+          var-file: stage.tfvars
