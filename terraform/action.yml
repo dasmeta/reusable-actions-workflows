@@ -46,6 +46,11 @@ inputs:
     description: "Allows to enable plan result direct apply"
     required: false
     default: "false"
+  target-branch:
+    description: "target branch to pull"
+    required: false
+    default: "master"
+
 runs:
   using: "composite"
   steps:
@@ -53,6 +58,13 @@ runs:
       uses: actions/checkout@v2
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Merge branches
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        target_branch: ${{ inputs.target-branch }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: marceloprado/has-changed-path@v1
       id: changed
