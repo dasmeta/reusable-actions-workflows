@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Publish terraform plan result into PR
-      uses: dasmeta/reusable-actions-workflows/terraform@0.2.0
+      uses: dasmeta/reusable-actions-workflows/terraform@0.2.2
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:

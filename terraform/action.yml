@@ -64,7 +64,7 @@ runs:
       with:
         type: now
         target_branch: ${{ inputs.target-branch }}
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github-token }}
 
     - uses: marceloprado/has-changed-path@v1
       id: changed
