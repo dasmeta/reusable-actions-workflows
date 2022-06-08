@@ -19,7 +19,7 @@ jobs:
           - project2
     steps:
       - name: Plan stage ${{ matrix.path }}
-        uses: dasmeta/reusable-actions-workflows/terraform@0.2.3
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.4
         with:
           post-plan-to-github-pr: 'false'
           do-apply: 'true'

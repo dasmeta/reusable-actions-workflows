@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Publish terraform plan result into PR
-      uses: dasmeta/reusable-actions-workflows/terraform@0.2.2
+      uses: dasmeta/reusable-actions-workflows/terraform@0.2.4
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Publish terraform plan result into PR
-        uses: dasmeta/reusable-actions-workflows/terraform@0.2.3
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -102,7 +102,7 @@ jobs:
           - sample-path-to-terraform-project-sources
     steps:
       - name: Publish terraform plan result into PR
-        uses: dasmeta/reusable-actions-workflows/terraform@0.2.0
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.4
         with:
           fetch-depth: 100
           post-plan-to-github-pr: 'true'
@@ -138,7 +138,7 @@ jobs:
           - sample-path-to-terraform-project-sources
     steps:
       - name: Plan stage ${{ matrix.path }}
-        uses: dasmeta/reusable-actions-workflows/terraform@0.2.0
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.4
         with:
           post-plan-to-github-pr: 'false'
           do-apply: 'true'

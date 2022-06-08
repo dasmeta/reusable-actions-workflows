@@ -63,7 +63,7 @@ runs:
       uses: devmasx/merge-branch@master
       with:
         type: now
-        target_branch: ${{ inputs.target-branch }}
+        target_branch: ${{ inputs.target_branch }}
         github_token: ${{ inputs.github-token }}
 
     - uses: marceloprado/has-changed-path@v1
