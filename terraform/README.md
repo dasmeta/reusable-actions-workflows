@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Publish terraform plan result into PR
-        uses: dasmeta/reusable-actions-workflows/terraform@0.2.0
+        uses: dasmeta/reusable-actions-workflows/terraform@0.2.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
