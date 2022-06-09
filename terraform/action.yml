@@ -46,7 +46,7 @@ inputs:
     description: "Allows to enable plan result direct apply"
     required: false
     default: "false"
-   target-branch:
+  target-branch:
     description: 'The name of target branch to merge'
     required: false
     default: "master"
