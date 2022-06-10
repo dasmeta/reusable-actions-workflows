@@ -60,6 +60,7 @@ runs:
         fetch-depth: ${{ inputs.fetch-depth }}
 
     - name: Merge branches
+      if: ${{inputs.target_branch}}
       uses: devmasx/merge-branch@master
       with:
         type: now
