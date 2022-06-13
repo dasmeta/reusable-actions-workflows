@@ -60,7 +60,7 @@ runs:
       uses: devmasx/merge-branch@master
       with:
         type: now
-        source_ref: ${{ github.ref }}
+        from_branch: ${{ github.ref }}
         target_branch: ${{ github.event.pull_request.base.ref }}
         github_token: ${{ inputs.github-token }}
 
