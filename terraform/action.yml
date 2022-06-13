@@ -59,7 +59,7 @@ runs:
       if: ${{inputs.is-pr == 'true'}}
       uses: everlytic/branch-merge@1.1.2
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ inputs.github-token }}
         source_ref: ${{ github.ref }}
         target_branch: ${{ github.event.pull_request.base.ref }}
 
