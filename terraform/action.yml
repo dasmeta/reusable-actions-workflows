@@ -62,8 +62,7 @@ runs:
         type: now
         target_branch: ${{ github.event.pull_request.base.ref }}
         github_token: ${{ inputs.github-token }}
-
-
+        
     - uses: marceloprado/has-changed-path@v1
       id: changed
       with:
