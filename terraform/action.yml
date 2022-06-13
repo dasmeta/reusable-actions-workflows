@@ -57,11 +57,13 @@ runs:
 
     - name: Merge branches
       if: ${{inputs.is-pr == 'true'}}
-      uses: everlytic/branch-merge@1.1.2
+      uses: devmasx/merge-branch@master
       with:
-        github_token: ${{ inputs.github-token }}
+        type: now
         source_ref: ${{ github.ref }}
         target_branch: ${{ github.event.pull_request.base.ref }}
+        github_token: ${{ inputs.github-token }}
+
 
     - uses: marceloprado/has-changed-path@v1
       id: changed
