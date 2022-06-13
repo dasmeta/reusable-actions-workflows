@@ -22,7 +22,7 @@ jobs:
           - project2
     steps:
       - name: Publish stage terraform plan result into PR
-        uses: dasmeta/reusable-actions-workflows/terraform@0.3.2
+        uses: dasmeta/reusable-actions-workflows/terraform@0.0.4
         with:
           post-plan-to-github-pr: 'true'
           fetch-depth: 100
