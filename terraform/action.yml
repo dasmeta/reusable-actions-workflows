@@ -56,11 +56,11 @@ runs:
         fetch-depth: ${{ inputs.fetch-depth }}
 
     - name: Merge branches
-      if: ${{ github.event.pull_request.base.ref }} && ${{inputs.is-pr == 'true'}}
+      if: ${{inputs.is-pr == 'true'}}
       uses: devmasx/merge-branch@master
       with:
         type: now
-        target_branch: ${{ inputs.target_branch }}
+        target_branch: ${{ github.event.pull_request.base.ref }}
         github_token: ${{ inputs.github_token }}
 
     - uses: marceloprado/has-changed-path@v1
