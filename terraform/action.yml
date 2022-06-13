@@ -38,7 +38,7 @@ inputs:
     description: "Variable file"
     required: false
     default: "env.tfvars"
-  post-plan-to-github-pr:
+  is-pr:
     description: "Allows to disable plan result posting into github PR as comment"
     required: false
     default: "true"
@@ -46,10 +46,6 @@ inputs:
     description: "Allows to enable plan result direct apply"
     required: false
     default: "false"
-  target_branch:
-    description: 'The name of target branch to merge'
-    required: false
-    default: "master"
 
 runs:
   using: "composite"
@@ -60,12 +56,12 @@ runs:
         fetch-depth: ${{ inputs.fetch-depth }}
 
     - name: Merge branches
-      if: ${{inputs.target_branch}}
+      if: ${{inputs.is-pr == 'true'}}
       uses: devmasx/merge-branch@master
       with:
         type: now
-        target_branch: ${{ inputs.target_branch }}
-        github_token: ${{ inputs.github_token }}
+        target_branch: ${{ github.event.pull_request.base.ref }}
+        github_token: ${{ inputs.github-token }}
 
     - uses: marceloprado/has-changed-path@v1
       id: changed
@@ -113,7 +109,7 @@ runs:
       shell: bash
 
     - name: Post Plan to GitHub PR
-      if: ${{inputs.post-plan-to-github-pr == 'true'}}
+      if: ${{inputs.is-pr == 'true'}}
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ inputs.github-token }}
