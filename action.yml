@@ -5,6 +5,9 @@ inputs:
     description: options to pass to pre-commit run
     required: false
     # default: '--all-files'
+  github-token:
+    description: "GitHub token for commenting on PRs. Defaults to using 'secrets.GITHUB_TOKEN'"
+    required: true
 runs:
   using: composite
   steps:
@@ -36,6 +39,6 @@ runs:
   - name: comment PR
     uses: machine-learning-apps/pr-comment@master
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      github_token: ${{ inputs.github-token }}
     with:
       path: results/results.txt
