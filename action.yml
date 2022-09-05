@@ -34,6 +34,7 @@ runs:
   - uses: actions/upload-artifact@v1
     with:
       name: results
+      path: ./
   - uses: actions/download-artifact@v1
     with:
       name: results
