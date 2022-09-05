@@ -37,6 +37,7 @@ runs:
   - uses: actions/download-artifact@v1
     with:
       name: results
+      path: ./
   - name: comment PR
     uses: machine-learning-apps/pr-comment@master
     env:
