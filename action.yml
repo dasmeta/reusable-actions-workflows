@@ -27,6 +27,8 @@ runs:
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
+  - run: sudo mkdir output; sudo cd output; sudo touch results.txt;
+    shell: bash
   - run: pre-commit run --show-diff-on-failure --color=always ${{ inputs.extra_args }} > output/results.txt
     shell: bash
   - uses: actions/upload-artifact@v1
