@@ -41,6 +41,6 @@ runs:
   - name: comment PR
     uses: machine-learning-apps/pr-comment@master
     env:
-      github_token: ${{ inputs.github-token }}
+      github-token: ${{ inputs.github-token }}
     with:
       path: results/results.txt
