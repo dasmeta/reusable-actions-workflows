@@ -27,18 +27,16 @@ runs:
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-  - run: touch results.txt
-    shell: bash
-  - run: pre-commit run --show-diff-on-failure --color=always ${{ inputs.extra_args }} > results.txt
+  - run: pre-commit run --show-diff-on-failure --color=always ${{ inputs.extra_args }} > pre-commit/results.txt
     shell: bash
   - uses: actions/upload-artifact@v1
     with:
       name: results
-      path: ./
+      path: pre-commit
   - uses: actions/download-artifact@v1
     with:
       name: results
-      path: ./
+      path: pre-commit
   - name: comment PR
     uses: machine-learning-apps/pr-comment@master
     env:
