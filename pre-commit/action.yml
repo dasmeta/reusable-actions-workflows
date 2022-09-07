@@ -30,7 +30,7 @@ runs:
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-  - run: pre-commit run --show-diff-on-failure --color=always ${{ inputs.extra_args }} | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > pre-commit/results.txt
+  - run: pre-commit run --show-diff-on-failure ${{ inputs.extra_args }} | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > pre-commit/results.txt
     shell: bash
   - name: Put Files in ENV Vars
     run: |
