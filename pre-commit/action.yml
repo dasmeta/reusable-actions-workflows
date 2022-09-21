@@ -30,11 +30,11 @@ runs:
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-  - run: pre-commit run --show-diff-on-failure ${{ inputs.extra_args }} | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > pre-commit/results.txt
+  - run: pre-commit run --show-diff-on-failure ${{ inputs.extra_args }} | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
     shell: bash
   - name: Put Files in ENV Vars
     run: |
-      RESULT=$(cat pre-commit/results.txt)
+      RESULT=$(cat results.txt)
       echo "RESULT<<EOF" >> $GITHUB_ENV
       echo "$RESULT" >> $GITHUB_ENV
       echo "EOF" >> $GITHUB_ENV
@@ -48,7 +48,6 @@ runs:
       repo-token-user-login: 'github-actions[bot]'
       message: |
           ## Output
-
           ```diff
           ${{ env.RESULT }}
           ```

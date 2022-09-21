@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Pre-Commit Result to PR comment
-      uses: dasmeta/reusable-actions-workflows/pre-commit@0.0.6
+      uses: dasmeta/reusable-actions-workflows/pre-commit@0.0.7
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:
@@ -25,7 +25,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v3
     - name: self test action
-      uses: dasmeta/reusable-actions-workflows/pre-commit@0.0.6
+      uses: dasmeta/reusable-actions-workflows/pre-commit@0.0.7
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
