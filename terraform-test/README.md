@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Terraform Test
-      uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.5
+      uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.8
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:
@@ -22,7 +22,7 @@ jobs:
   terraform-validate:
     runs-on: ubuntu-latest
     steps:
-    - uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.5
+    - uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.8
       with:
         aws-region: ${{ secrets.AWS_REGION}}
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
