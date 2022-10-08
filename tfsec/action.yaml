@@ -1,0 +1,30 @@
+name: Terraform TEST
+description: "terraform tool common flow action to init, test terraform code"
+author: Das Meta
+branding:
+  icon: globe
+  color: purple
+inputs:
+  fetch-depth: 
+    description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
+    required: false
+    default: 0
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+        persist-credentials: false
+
+      - name: tfsec
+        uses: aquasecurity/tfsec-sarif-action@v0.1.0
+        with:
+          sarif_file: tfsec.sarif          
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: tfsec.sarif  
+          
