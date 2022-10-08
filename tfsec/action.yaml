@@ -18,13 +18,12 @@ runs:
         fetch-depth: ${{ inputs.fetch-depth }}
         persist-credentials: false
 
-      - name: tfsec
-        uses: aquasecurity/tfsec-sarif-action@v0.1.0
-        with:
-          sarif_file: tfsec.sarif          
+    - name: tfsec
+      uses: aquasecurity/tfsec-sarif-action@v0.1.0
+      with:
+        sarif_file: tfsec.sarif          
 
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: tfsec.sarif  
-          
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: tfsec.sarif  
