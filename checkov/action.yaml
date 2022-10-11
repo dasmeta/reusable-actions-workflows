@@ -36,3 +36,4 @@ runs:
       with:
         directory: ${{ inputs.directory }}
         framework: terraform 
+        download_external_modules: true
