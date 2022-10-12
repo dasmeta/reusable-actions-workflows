@@ -47,7 +47,7 @@ runs:
 
     - name: Put Files in ENV Vars
       run: |
-        CHECKOV=$(cat results.sarif)
+        CHECKOV=$(cat results.sarif) | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'
         echo "CHECKOV<<EOF" >> $GITHUB_ENV
         echo "$CHECKOV" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
