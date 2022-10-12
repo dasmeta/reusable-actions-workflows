@@ -1,5 +1,5 @@
-name: Terraform TEST
-description: "terraform tool common flow action to init, test terraform code"
+name: Checkov
+description: "terraform tool"
 author: Das Meta
 branding:
   icon: globe
@@ -10,9 +10,12 @@ inputs:
     required: false
     default: 0
   directory:
-    description: "Path where will run terraform test"
+    description: "Path where will run checkov"
     required: false
     default: modules/dashboard
+  github-token:
+    description: "Path where will run checkov"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -37,3 +40,30 @@ runs:
         directory: ${{ inputs.directory }}
         framework: terraform 
         download_external_modules: true
+      continue-on-error: true
+    
+    - run: echo '${{ steps.checkov.outputs.stdout || steps.checkov.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > checkov.txt
+      shell: bash
+
+    - name: Put Files in ENV Vars
+      run: |
+        CHECKOV=$(cat checkov.txt)
+        echo "CHECKOV<<EOF" >> $GITHUB_ENV
+        echo "$CHECKOV" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Post to GitHub PR
+      uses: mshick/add-pr-comment@v1
+      with:
+        repo-token: ${{ inputs.github-token }}
+        allow-repeats: true
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+            ## CHECKOV Output
+           
+            ```diff
+            ${{ env.CHECKOV }}
+            ```
+            
+            Merge to apply all of the above
