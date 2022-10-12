@@ -33,6 +33,7 @@ runs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.8
+
     - name: Test with Checkov
       id: checkov
       uses: bridgecrewio/checkov-action@master
@@ -41,23 +42,8 @@ runs:
         framework: terraform 
         download_external_modules: true
       continue-on-error: true
-    
-    # - run: echo '${{ steps.checkov.outputs.stdout || steps.checkov.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > ${{ inputs.directory }}/checkov.txt
-    #   shell: bash
 
-    - name: Put Files in ENV Vars
-      run: |
-        CHECKOV=$(cat results.sarif) | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'
-        echo "CHECKOV<<EOF" >> $GITHUB_ENV
-        echo "$CHECKOV" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Post to GitHub PR
-      uses: mshick/add-pr-comment@v1
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
       with:
-        repo-token: ${{ inputs.github-token }}
-        allow-repeats: true
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-          ${{env.CHECKOV}}
+        sarif_file: results.sarif    
