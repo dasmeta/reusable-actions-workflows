@@ -42,12 +42,12 @@ runs:
         download_external_modules: true
       continue-on-error: true
     
-    - run: echo '${{ steps.checkov.outputs.stdout || steps.checkov.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > checkov.txt
+    - run: echo '${{ steps.checkov.outputs.stdout || steps.checkov.outputs.stderr }}' | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > ${{ inputs.directory }}/checkov.txt
       shell: bash
 
     - name: Put Files in ENV Vars
       run: |
-        CHECKOV=$(cat checkov.txt)
+        CHECKOV=$(cat ${{ inputs.directory }}/checkov.txt)
         echo "CHECKOV<<EOF" >> $GITHUB_ENV
         echo "$CHECKOV" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
@@ -60,10 +60,4 @@ runs:
         allow-repeats: true
         repo-token-user-login: 'github-actions[bot]'
         message: |
-            ## CHECKOV Output
-           
-            ```diff
-            ${{ env.CHECKOV }}
-            ```
-            
-            Merge to apply all of the above
+          ${{env.CHECKOV}}
