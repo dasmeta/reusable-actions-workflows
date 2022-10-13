@@ -1,5 +1,5 @@
 name: Checkov
-description: "terraform tool"
+description: "Static code analysis tool for scanning infrastructure"
 author: Das Meta
 branding:
   icon: globe
@@ -10,17 +10,14 @@ inputs:
     required: false
     default: 0
   directory:
-    description: "Path where will run checkov"
+    description: "Path where will run Checkov"
     required: false
     default: modules/dashboard
-  github-token:
-    description: "Path where will run checkov"
-    required: false
 runs:
   using: "composite"
   steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
 

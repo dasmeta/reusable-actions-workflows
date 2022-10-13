@@ -1,5 +1,5 @@
 # GitHub Actions: Run TFSEC
-GitHub Action for running terraform tfsec security scanning
+GitHub Action for running terraform tfsec security scanning.  It is static analysis security scanner for your Terraform code
 
 ## Usage
 
@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: TFSEC
-      uses: dasmeta/reusable-actions-workflows/tfsec@0.0.9
+      uses: dasmeta/reusable-actions-workflows/tfsec@4.0.0
 ```
 
 ## For Default Configuration in .github/workflows/tfsec.yml you must have:
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-    - uses: dasmeta/reusable-actions-workflows/tfsec@0.0.9
+    - uses: dasmeta/reusable-actions-workflows/tfsec@4.0.0
       with:
         fetch-depth: 0
 

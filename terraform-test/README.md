@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Terraform Test
-      uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.8
+      uses: dasmeta/reusable-actions-workflows/terraform-test@2.0.0
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:
@@ -28,7 +28,7 @@ jobs:
           - billing
     permissions: write-all
     steps:
-    - uses: dasmeta/reusable-actions-workflows/terraform-test@0.0.8
+    - uses: dasmeta/reusable-actions-workflows/terraform-test@2.0.0
       with:
         aws-region: ${{ secrets.AWS_REGION}}
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}

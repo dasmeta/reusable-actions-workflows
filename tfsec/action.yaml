@@ -1,5 +1,5 @@
-name: Terraform TEST
-description: "terraform tool common flow action to init, test terraform code"
+name: Tfsec
+description: "Static analysis security scanner for your Terraform cod"
 author: Das Meta
 branding:
   icon: globe
