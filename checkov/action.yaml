@@ -1,0 +1,46 @@
+name: Checkov
+description: "Static code analysis tool for scanning infrastructure"
+author: Das Meta
+branding:
+  icon: globe
+  color: purple
+inputs:
+  fetch-depth: 
+    description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
+    required: false
+    default: 0
+  directory:
+    description: "Path where will run Checkov"
+    required: false
+    default: modules/dashboard
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.2.1
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Test with Checkov
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: ${{ inputs.directory }}
+        framework: terraform 
+        download_external_modules: true
+      continue-on-error: true
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: results.sarif    

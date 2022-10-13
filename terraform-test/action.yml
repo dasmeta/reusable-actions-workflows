@@ -1,0 +1,50 @@
+name: Terraform TEST
+description: "terraform tool common flow action to init, test terraform code"
+author: Das Meta
+branding:
+  icon: globe
+  color: purple
+inputs:
+  fetch-depth: 
+    description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
+    required: false
+    default: 0
+  aws-region: 
+    description: "AWS Region, e.g. us-east-2"
+    required: false
+    default: eu-central-1
+  aws-access-key-id: 
+    description: "AWS Access Key ID. This input is required if running in the GitHub hosted environment."
+    required: false 
+  aws-secret-access-key:
+    description: "AWS Secret Access Key. This input is required if running in the GitHub hosted environment."
+    required: false
+  path:
+    description: "Path where to run terraform test"
+    required: false
+    default: dashboard
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.2.1
+
+    - name: Run Terraform Test
+      run: |
+        cd ${{ inputs.path }}
+        terraform test
+      shell: bash
