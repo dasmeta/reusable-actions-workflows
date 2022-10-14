@@ -35,6 +35,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         path: modules/${{ matrix.path }}
         api-key: ${{ secrets.INFRACOST_API_KEY }}
+        token: ${{ secrets.GITHUB_TOKEN}}
 
 ```
 
@@ -56,3 +57,6 @@ Optional. Add path where will run job.
 
 `api-key`
 Optional. Your Infracost API key. you can get it by typing this `infracost configure get api_key`
+
+`token`
+Optional. Your Github personal access token.
