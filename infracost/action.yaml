@@ -1,45 +1,50 @@
 name: Infracost
-description: "shows cloud cost estimates for Terraform."
+description: "cloud cost estimates for Terraform in pull requests"
 author: Das Meta
 branding:
   icon: globe
   color: purple
 inputs:
-  fetch-depth: 
-    description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
+  INFRACOST_API_KEY: 
+    description: "your Infracost API key. you can get it by typing this `infracost configure get api_key`"
     required: false
-    default: 0
-  api-key:
-    description: "Your Infracost API key"
-    required: false
-  path:
-    description: "The path where will run this job"
-    required: false
-  token:
-    description: "Yout github token"
+  path: 
+    description: "path where will run infracost"
     required: false
 runs:
   using: "composite"
-  steps:  
-      - name: Checkout base branch
-        uses: actions/checkout@v2
-        with:
-          ref: '${{ github.event.pull_request.base.ref }}'
-          fetch-depth: 0
-      
-      - name: Setup Infracost
-        uses: infracost/actions/setup@v2
-        with:
-          api-key: ${{ inputs.api-key }}
+  steps:
+    - name: Setup Infracost
+      uses: infracost/actions/setup@v2
+      with:
+        api-key: ${{ inputs.INFRACOST_API_KEY }}
 
-      - name: Infracost Breakdown
+    - name: Checkout base branch
+      uses: actions/checkout@v3
+      with:
+        ref: '${{ github.event.pull_request.base.ref }}'
+    
+    - name: Generate Infracost cost estimate baseline
         run: |
-            infracost breakdown --path ${{inputs.path}} --format=json --out-file=${{inputs.path}}.json
-          
-      - name: Post Infracost comment
-        run: |
-            infracost comment github  --path=${{inputs.path}}.json \
-                                      --repo=$GITHUB_REPOSITORY \
-                                      --github-token=${{inputs.token}} \
-                                      --pull-request=${{github.event.pull_request.number}} \
-                                      --behavior=update
+          infracost breakdown --path=${{inputs.path}} \
+                              --format=json \
+                              --out-file=/tmp/infracost-base.json
+
+    - name: Checkout PR branch
+      uses: actions/checkout@v3
+
+    - name: Generate Infracost diff
+      run: |
+        infracost diff --path=${{inputs.path}} \
+                        --format=json \
+                        --compare-to=/tmp/infracost-base.json \
+                        --out-file=/tmp/infracost.json
+
+    - name: Post Infracost comment
+      run: |
+          infracost comment github --path=/tmp/infracost.json \
+                                    --repo=$GITHUB_REPOSITORY \
+                                    --github-token=${{github.token}} \
+                                    --pull-request=${{github.event.pull_request.number}} \
+                                    --behavior=update
+      
