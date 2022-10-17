@@ -27,3 +27,8 @@ repos:
         - --hook-config=--path-to-file=README.md        .
         - --hook-config=--add-to-existing-file=true
         - --hook-config=--create-file-if-not-exist=true
+    - id: terraform_tflint
+      args:
+        - --args=--module
+        - --args=--enable-rule=terraform_documented_variables
+        - --args=--enable-rule=terraform_unused_declarations
