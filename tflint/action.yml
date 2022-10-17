@@ -50,11 +50,15 @@ runs:
       run: |
           cd ${{ inputs.path}}
           terraform init
+      shell: bash
 
     - name: Setup TFLint
       run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      shell: bash
+    
     - name: Show version
       run: tflint --version
+      shell: bash
 
     - name: Init TFLint
       id: tflint
