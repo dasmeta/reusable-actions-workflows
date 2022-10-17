@@ -11,6 +11,19 @@ inputs:
   repo-token:
     description: "GitHub token for commenting on PRs. Defaults to using 'secrets.GITHUB_TOKEN'"
     required: false
+    aws-region: 
+    description: "AWS Region, e.g. us-east-2"
+    required: false
+    default: us-east-1
+  aws-access-key-id: 
+    description: "AWS Access Key ID. This input is required if running in the GitHub hosted environment."
+    required: false 
+  aws-secret-access-key:
+    description: "AWS Secret Access Key. This input is required if running in the GitHub hosted environment."
+    required: false
+  path:
+    description: "path"
+    required: false
 runs:
   using: composite
   steps:
@@ -28,6 +41,22 @@ runs:
     shell: bash
   - run: sudo mv terraform-docs /usr/terraform-docs
     shell: bash
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-region: ${{ inputs.aws-region }}
+      aws-access-key-id: ${{ inputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v2
+    with:
+      terraform_version: 1.2.1
+  - name: Initialize Terraform
+    run: |
+        cd ${{ inputs.path }}
+        terraform init
+    shell: bash
+  
   - uses: actions/cache@v3
     with:
       path: ~/.cache/pre-commit
