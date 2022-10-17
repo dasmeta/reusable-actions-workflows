@@ -20,8 +20,8 @@ runs:
     shell: bash
   - run: curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
     shell: bash
-  - name: Setup TFLint
-      run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+  - run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+    shell: bash
   - run: tar -xzf terraform-docs.tar.gz
     shell: bash
   - run: chmod +x terraform-docs
