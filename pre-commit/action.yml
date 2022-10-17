@@ -11,7 +11,7 @@ inputs:
   repo-token:
     description: "GitHub token for commenting on PRs. Defaults to using 'secrets.GITHUB_TOKEN'"
     required: false
-    aws-region: 
+  aws-region: 
     description: "AWS Region, e.g. us-east-2"
     required: false
     default: us-east-1
