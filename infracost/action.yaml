@@ -4,13 +4,6 @@ author: Das Meta
 branding:
   icon: globe
   color: purple
-inputs:
-  INFRACOST_API_KEY: 
-    description: "your Infracost API key. you can get it by typing this `infracost configure get api_key`"
-    required: false
-  path: 
-    description: "path where will run infracost"
-    required: false
 runs:
   using: "composite"
   steps:
@@ -26,7 +19,7 @@ runs:
     
     - name: Generate Infracost cost estimate baseline
         run: |
-          infracost breakdown --path=${{inputs.path}} \
+          infracost breakdown --path=example/ \
                               --format=json \
                               --out-file=/tmp/infracost-base.json
 
@@ -35,7 +28,7 @@ runs:
 
     - name: Generate Infracost diff
       run: |
-        infracost diff --path=${{inputs.path}} \
+        infracost diff --path=example/ \
                         --format=json \
                         --compare-to=/tmp/infracost-base.json \
                         --out-file=/tmp/infracost.json
@@ -47,4 +40,3 @@ runs:
                                     --github-token=${{github.token}} \
                                     --pull-request=${{github.event.pull_request.number}} \
                                     --behavior=update
-      

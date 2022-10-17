@@ -10,7 +10,7 @@ This action can be used as follows:
       uses: dasmeta/reusable-actions-workflows/checkov@1.0.0
 ```
 
-## For Default Configuration in .github/workflows/check.yml you must have:
+## For Default Configuration in .github/workflows/xxx.yml you must have:
 ```yaml
 name: Checkov
 on:

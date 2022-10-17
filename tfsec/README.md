@@ -10,7 +10,7 @@ This action can be used as follows add latest version:
       uses: dasmeta/reusable-actions-workflows/tfsec@4.0.0
 ```
 
-## For Default Configuration in .github/workflows/tfsec.yml you must have:
+## For Default Configuration in .github/workflows/xxx.yml you must have:
 
 ```yaml
 name: TFSEC

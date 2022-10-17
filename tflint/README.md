@@ -10,7 +10,7 @@ This action can be used as follows add latest version:
       uses: dasmeta/reusable-actions-workflows/tflint@3.0.0
 ```
 
-## For Default Configuration in .github/workflows/check.yml you must have:
+## For Default Configuration in .github/workflows/xxx.yml you must have:
 ```yaml
 name: Tflint
 on:

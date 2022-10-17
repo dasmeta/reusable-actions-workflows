@@ -1,15 +1,7 @@
 # GitHub Actions: Run Infracost
-GitHub Action for Infracost
+GitHub Action for Infracost it generates cloud cost estimation for Terraform in pull requests comment.
 
 ## Usage
-
-This action can be used as follows add latest version:
-
-```yaml
-    - name: Infracost
-      uses: dasmeta/reusable-actions-workflows/infracost@5.0.0
-```
-
 ## For Default Configuration in .github/workflows/xxx.yml you must have:
 ```yaml
 name: Infracost
@@ -17,46 +9,47 @@ on:
   pull_request:
   push:
     branches: [main, master]
-
 jobs:
   terraform-validate:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         path:
-          - folder1
-          - folder2
+          - dashboard
     permissions: write-all
     steps:
-    - uses: dasmeta/reusable-actions-workflows/infracost@5.0.0
-      with:
-        aws-region: ${{ secrets.AWS_REGION}}
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        path: modules/${{ matrix.path }}
-        api-key: ${{ secrets.INFRACOST_API_KEY }}
-        token: ${{ secrets.GITHUB_TOKEN}}
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v2
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Checkout base branch
+        uses: actions/checkout@v3
+        with:
+          ref: '${{ github.event.pull_request.base.ref }}'
+
+      - name: Generate Infracost cost estimate baseline
+        run: |
+          infracost breakdown --path=modules/${{ matrix.path }} \
+                              --format=json \
+                              --out-file=/tmp/infracost-base.json
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --path=modules/${{ matrix.path }}\
+                          --format=json \
+                          --compare-to=/tmp/infracost-base.json \
+                          --out-file=/tmp/infracost.json
+
+      - name: Post Infracost comment
+        run: |
+            infracost comment github --path=/tmp/infracost.json \
+                                     --repo=$GITHUB_REPOSITORY \
+                                     --github-token=${{github.token}} \
+                                     --pull-request=${{github.event.pull_request.number}} \
+                                     --behavior=update
 
 ```
-
-## Valid INPUTS
-
-
-`aws-region`
-Optional. 'AWS Region, e.g. us-east-2'
-`Default: eu-central-1`
-
-`aws-access-key-id:` 
-Optional. AWS Access Key ID. This input is required if running in the GitHub hosted environment.
-
-`aws-secret-access-key`
-Optional. AWS Secret Access Key. This input is required if running in the GitHub hosted environment.
-
-`path`
-Optional. Add path where will run job.
-
-`api-key`
-Optional. Your Infracost API key. you can get it by typing this `infracost configure get api_key`
-
-`token`
-Optional. Your Github personal access token.
