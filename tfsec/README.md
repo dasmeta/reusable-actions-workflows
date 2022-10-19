@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: TFSEC
-      uses: dasmeta/reusable-actions-workflows/tfsec@4.0.0
+      uses: dasmeta/reusable-actions-workflows/tfsec@main
 ```
 
 ## For Default Configuration in .github/workflows/xxx.yml you must have:
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-    - uses: dasmeta/reusable-actions-workflows/tfsec@4.0.0
+    - uses: dasmeta/reusable-actions-workflows/tfsec@main
       with:
         fetch-depth: 0
 

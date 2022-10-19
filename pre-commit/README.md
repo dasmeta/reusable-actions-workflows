@@ -7,7 +7,7 @@ This action can be used as follows add latest version:
 
 ```yaml
     - name: Pre-Commit Result to PR comment
-      uses: dasmeta/reusable-actions-workflows/pre-commit@7.0.0
+      uses: dasmeta/reusable-actions-workflows/pre-commit@main
 ```
 
 ## For Default Configuration in .github/workflows/check.yml you must have:
@@ -30,7 +30,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v3
     - name: self test action
-      uses: dasmeta/reusable-actions-workflows/pre-commit@infracost
+      uses: dasmeta/reusable-actions-workflows/pre-commit@main
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
