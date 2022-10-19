@@ -13,21 +13,29 @@ This action can be used as follows add latest version:
 ## For Default Configuration in .github/workflows/check.yml you must have:
 
 ```yaml
+name: Infracost
 on:
   pull_request:
   push:
-    branches: [main, test-me-*]
-
+    branches: [main, master]
 jobs:
-  main:
+  terraform-validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - dashboard
+    permissions: write-all
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v3
     - name: self test action
-      uses: dasmeta/reusable-actions-workflows/pre-commit@7.0.0
+      uses: dasmeta/reusable-actions-workflows/pre-commit@infracost
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        path: modules/${{ matrix.path }}
 
 ```
 
