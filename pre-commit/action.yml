@@ -5,35 +5,68 @@ branding:
   icon: globe
   color: purple
 inputs:
-  extra_args:
-    description: options to pass to pre-commit run
-    required: false
   repo-token:
     description: "GitHub token for commenting on PRs. Defaults to using 'secrets.GITHUB_TOKEN'"
+    required: false
+  aws-region: 
+    description: "AWS Region, e.g. us-east-2"
+    required: false
+    default: eu-central-1
+  aws-access-key-id: 
+    description: "AWS Access Key ID. This input is required if running in the GitHub hosted environment."
+    required: false 
+  aws-secret-access-key:
+    description: "AWS Secret Access Key. This input is required if running in the GitHub hosted environment."
+    required: false
+  path:
+    description: "path"
     required: false
 runs:
   using: composite
   steps:
+  - name: Check out code
+    uses: actions/checkout@v3
+    with:
+      fetch-depth: 0
+      
   - run: python -m pip install pre-commit
     shell: bash
   - run: python -m pip freeze --local
     shell: bash
-  - run: curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+  - run: |
+        curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+        tar -xzf terraform-docs.tar.gz
+        chmod +x terraform-docs
+        sudo mv terraform-docs /usr/bin/terraform-docs
     shell: bash
-  - run: tar -xzf terraform-docs.tar.gz
-    shell: bash
-  - run: chmod +x terraform-docs
-    shell: bash
-  - run: sudo mv terraform-docs /usr/terraform-docs
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-region: ${{ inputs.aws-region}}
+      aws-access-key-id: ${{ inputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v2
+    with:
+      terraform_version: 1.2.1
+  - name: Initialize Terraform
+    run: |
+        cd ${{ inputs.path }}
+        terraform init
     shell: bash
   - uses: actions/cache@v3
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-  - run: pre-commit run --show-diff-on-failure ${{ inputs.extra_args }} | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
+  - run: |
+      cd ${{ inputs.path }}
+      touch results.txt
+      pre-commit run -a | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
     shell: bash
+    continue-on-error: true
   - name: Put Files in ENV Vars
     run: |
+      cd ${{ inputs.path }}
       RESULT=$(cat results.txt)
       echo "RESULT<<EOF" >> $GITHUB_ENV
       echo "$RESULT" >> $GITHUB_ENV

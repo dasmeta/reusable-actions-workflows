@@ -7,10 +7,10 @@ This action can be used as follows:
 
 ```yaml
     - name: Checkov
-      uses: dasmeta/reusable-actions-workflows/checkov@1.0.0
+      uses: dasmeta/reusable-actions-workflows/checkov@main
 ```
 
-## For Default Configuration in .github/workflows/check.yml you must have:
+## For Default Configuration in .github/workflows/xxx.yml you must have:
 ```yaml
 name: Checkov
 on:
@@ -27,7 +27,7 @@ jobs:
           - folder2
     permissions: write-all
     steps:
-    - uses: dasmeta/reusable-actions-workflows/checkov@1.0.0
+    - uses: dasmeta/reusable-actions-workflows/checkov@main
       with:
         fetch-depth: 0
         directory: modules/${{ matrix.directory }}
