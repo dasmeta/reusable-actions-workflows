@@ -49,11 +49,6 @@ runs:
     uses: hashicorp/setup-terraform@v2
     with:
       terraform_version: 1.2.1
-  - name: Initialize Terraform
-    run: |
-        cd ${{ inputs.path }}
-        terraform init
-    shell: bash
   - uses: actions/cache@v3
     with:
       path: ~/.cache/pre-commit
