@@ -40,7 +40,3 @@ runs:
         download_external_modules: true
       continue-on-error: true
 
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: results.sarif    
