@@ -82,7 +82,7 @@ runs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: ${{ input.terraform_version }}
+        terraform_version: ${{ inputs.terraform_version }}
 
     - name: Initialize Terraform
       run: |
