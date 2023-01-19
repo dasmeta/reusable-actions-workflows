@@ -51,12 +51,6 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
-    - name: Terraform init
-      run: |
-          cd ${{ inputs.path}}
-          terraform init
-      shell: bash
-
     - name: Setup TFLint
       run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
       shell: bash
