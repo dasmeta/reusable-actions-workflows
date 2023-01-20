@@ -13,16 +13,6 @@ inputs:
     description: "Path where will run checkov"
     required: false
     default: modules/dashboard
-  aws-region: 
-    description: "AWS Region, e.g. us-east-2"
-    required: false
-    default: us-east-1
-  aws-access-key-id: 
-    description: "AWS Access Key ID. This input is required if running in the GitHub hosted environment."
-    required: false 
-  aws-secret-access-key:
-    description: "AWS Secret Access Key. This input is required if running in the GitHub hosted environment."
-    required: false
   repo-token:
     description: "Path where will run checkov"
     required: false
@@ -38,14 +28,7 @@ runs:
       uses: actions/checkout@v2
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-region: ${{ inputs.aws-region }}
-        aws-access-key-id: ${{ inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
-
+        
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
