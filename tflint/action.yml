@@ -63,7 +63,7 @@ runs:
       shell: bash
 
     - name: Post to GitHub PR
-      if: ${{ ! grep -q 'No issues detected' results.txt }}
+      if: steps.tflint.outputs.exit_code != 0
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ inputs.repo-token }}
@@ -74,3 +74,4 @@ runs:
             ```diff
             ${{ env.RESULT }}
             ```
+
