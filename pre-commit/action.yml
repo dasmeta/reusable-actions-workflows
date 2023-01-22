@@ -46,7 +46,7 @@ runs:
     shell: bash
 
   - run: |
-      touch results.txt | pre-commit run -a | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > results.txt
+      pre-commit run -a > results.txt
     shell: bash
     
   - name: Put Files in ENV Vars
