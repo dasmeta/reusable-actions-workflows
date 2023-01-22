@@ -42,32 +42,25 @@ runs:
       run: tflint --version
       shell: bash
 
+    - name: Set working directory
+      run: |
+        cd ${{inputs.path}}
+      shell: bash
+
     - name: Init TFLint
       id: tflint
       run: |
-          cd ${{inputs.path}}
           tflint --enable-rule=terraform_unused_declarations | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
       shell: bash
       continue-on-error: true
 
-    - name: Put Files in ENV Vars
-      run: |
-        cd ${{inputs.path}}
-        RESULT=$(cat results.txt)
-        echo "RESULT<<EOF" >> $GITHUB_ENV
-        echo "$RESULT" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Post to GitHub PR
-      uses: mshick/add-pr-comment@v1
+    - name: Comment on PR
+      if: steps.tflint.outputs.exit_code != 0
+      uses: peter-evans/create-or-update-pull-request-comment@v1
       with:
-        repo-token: ${{ inputs.repo-token }}
-        allow-repeats: true
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-            ## Output
-            ```diff
-            ${{ env.RESULT }}
-            ```
-
+        body: |
+          TFLint results:
+          ```
+          $(cat results.txt)
+          ```
+        token: ${{ secrets.GITHUB_TOKEN }} 
