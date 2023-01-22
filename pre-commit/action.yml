@@ -46,7 +46,6 @@ runs:
     shell: bash
 
   - run: |
-      touch results.txt
       pre-commit run -a | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
     shell: bash
     
