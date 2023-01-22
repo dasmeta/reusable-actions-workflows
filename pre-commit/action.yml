@@ -46,7 +46,7 @@ runs:
     shell: bash
 
   - run: |
-      pre-commit run -a > results.txt
+      pre-commit run -a
     shell: bash
     
   - name: Put Files in ENV Vars
