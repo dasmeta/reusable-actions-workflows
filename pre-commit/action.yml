@@ -46,7 +46,8 @@ runs:
     shell: bash
 
   - run: |
-      pre-commit run -a
+      touch results.txt
+      pre-commit run -a | sed -E 's/^([[:space:]]+)([-+])/\2\1/g'  > results.txt
     shell: bash
     
   - name: Put Files in ENV Vars
@@ -63,7 +64,6 @@ runs:
 
 
   - name: Post to GitHub PR
-    if: ${{ success() }}
     uses: mshick/add-pr-comment@v1
     with:
       repo-token: ${{ inputs.repo-token }}
