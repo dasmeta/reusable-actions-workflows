@@ -56,7 +56,6 @@ runs:
 
     - name: Put Files in ENV Vars
       run: |
-        cd ${{inputs.path}}
         RESULT=$(cat results.txt)
         echo "RESULT<<EOF" >> $GITHUB_ENV
         echo "$RESULT" >> $GITHUB_ENV
