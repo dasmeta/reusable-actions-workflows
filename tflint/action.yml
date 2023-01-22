@@ -63,4 +63,4 @@ runs:
           ```
           $(cat results.txt)
           ```
-        token: ${{ secrets.GITHUB_TOKEN }} 
+        token: ${{ inputs.repo-token }} 
