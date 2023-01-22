@@ -54,13 +54,25 @@ runs:
       shell: bash
       continue-on-error: true
 
-    - name: Comment on PR
+    - name: Put Files in ENV Vars
+      run: |
+        cd ${{inputs.path}}
+        RESULT=$(cat results.txt)
+        echo "RESULT<<EOF" >> $GITHUB_ENV
+        echo "$RESULT" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Post to GitHub PR
       if: steps.tflint.outputs.exit_code != 0
-      uses: peter-evans/create-or-update-pull-request-comment@v1
+      uses: mshick/add-pr-comment@v1
       with:
-        body: |
-          TFLint results:
-          ```
-          $(cat results.txt)
-          ```
-        token: ${{ inputs.repo-token }} 
+        repo-token: ${{ inputs.repo-token }}
+        allow-repeats: true
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+            ## Output
+            ```diff
+            ${{ env.RESULT }}
+            ```
+
