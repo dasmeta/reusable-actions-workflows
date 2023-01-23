@@ -1,4 +1,4 @@
-name: Terraform TEST
+name: Terraform Test Pipeline
 description: "terraform tool common flow action to init, test terraform code"
 author: Das Meta
 branding:
@@ -22,7 +22,7 @@ inputs:
   path:
     description: "Path where to run terraform test"
     required: false
-    default: dashboard
+    default: /
   terraform_version:
     description: "Terraform version used in this action"
     required: false
@@ -48,8 +48,16 @@ runs:
       with:
         terraform_version: ${{ inputs.terraform_version }}
 
-    - name: Run Terraform Test
+    - name: Check for tests folder
       run: |
-        cd ${{ inputs.path }}
-        terraform test
+        if [ ! -d "${{ inputs.path }}/tests" ]; then
+          echo "Tests folder not found for ${{ inputs.path }}, exiting pipeline"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Run Terraform Test
+      if: ${{ success() }} 
+      run: |
+        terraform test -module=${{ inputs.path }}
       shell: bash
