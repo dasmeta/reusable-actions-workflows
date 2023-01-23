@@ -59,5 +59,6 @@ runs:
     - name: Run Terraform Test
       if: ${{ success() }} 
       run: |
-        terraform test -module=${{ inputs.path }}
+        cd ${{ inputs.path }}
+        terraform test
       shell: bash
