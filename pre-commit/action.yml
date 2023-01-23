@@ -60,6 +60,7 @@ runs:
     continue-on-error: true
 
   - name: Post to GitHub PR
+    if: ${{ success() }} 
     uses: mshick/add-pr-comment@v1
     with:
       repo-token: ${{ inputs.repo-token }}
