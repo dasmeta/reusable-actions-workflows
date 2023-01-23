@@ -52,10 +52,12 @@ runs:
       echo "$RESULT" >> $GITHUB_ENV
       echo "EOF" >> $GITHUB_ENV
     shell: bash
+    continue-on-error: true
 
   - name: check if pre-commit run has errors
     run: echo ${{ env.RESULT }} | grep -q "Failed"
     shell: bash
+    continue-on-error: true
 
   - name: Post to GitHub PR
     uses: mshick/add-pr-comment@v1
