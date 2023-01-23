@@ -37,6 +37,7 @@ runs:
     - name: Setup TFLint
       run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
       shell: bash
+      continue-on-error: true
     
     - name: Show version
       run: tflint --version
@@ -46,6 +47,7 @@ runs:
       run: |
         cd ${{inputs.path}}
       shell: bash
+      continue-on-error: true
 
     - name: Init TFLint
       id: tflint
