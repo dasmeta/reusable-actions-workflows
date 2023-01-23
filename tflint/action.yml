@@ -12,7 +12,7 @@ inputs:
   path:
     description: "Path where will run checkov"
     required: false
-    default: modules/dashboard
+    default: /
   repo-token:
     description: "Path where will run checkov"
     required: false
