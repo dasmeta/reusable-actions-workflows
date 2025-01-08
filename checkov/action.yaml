@@ -26,10 +26,10 @@ runs:
       with:
         terraform_version: 1.2.1
     
-    - name: Set up Python 3.8
+    - name: Set up Python 3.11
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.11.11
 
     - name: Test with Checkov
       id: checkov
