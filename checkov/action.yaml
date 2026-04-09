@@ -33,7 +33,7 @@ runs:
 
     - name: Test with Checkov
       id: checkov
-      uses: bridgecrewio/checkov-action@master
+      uses: bridgecrewio/checkov-action@v12.3093.0
       with:
         directory: ${{ inputs.directory }}
         framework: terraform 
