@@ -1,5 +1,20 @@
-# Here we have common github actins/workflows
+# Here we have common GitHub actions/workflows
 
-## For details how to use please check "./terraform"  and  "./pre-commit" folders
+## Available reusable actions
 
-## We have also examples available under "./examples"
+- `terraform`
+- `terraform-test`
+- `pre-commit`
+- `checkov`
+- `tfsec`
+- `tflint`
+- `trivy`
+- `infracost`
+
+## For usage details
+
+Please check the README in each action folder (for example `./trivy`, `./terraform`, `./pre-commit`).
+
+## Examples
+
+Examples are available under `./examples`.

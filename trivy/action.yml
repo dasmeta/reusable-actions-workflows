@@ -1,0 +1,65 @@
+name: Trivy
+description: "General-purpose security scanner powered by Trivy"
+author: Das Meta
+branding:
+  icon: shield
+  color: purple
+inputs:
+  fetch-depth:
+    description: "Number of commits to fetch. 0 indicates all history for all branches and tags."
+    required: false
+    default: 0
+  path:
+    description: "Path/reference to scan"
+    required: false
+    default: .
+  scan-type:
+    description: "Trivy scan type (for example: fs, repo, config, image)"
+    required: false
+    default: config
+  format:
+    description: "Trivy output format"
+    required: false
+    default: sarif
+  sarif-file:
+    description: "Output file name"
+    required: false
+    default: trivy.sarif
+  scanners:
+    description: "Comma-separated scanner list (for example: vuln,misconfig,secret,license)"
+    required: false
+    default: misconfig,secret
+  severity:
+    description: "Comma-separated severities to report"
+    required: false
+    default: "HIGH,CRITICAL"
+  exit-code:
+    description: "Exit code when findings are detected"
+    required: false
+    default: "0"
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+        persist-credentials: false
+        submodules: recursive
+
+    - name: Run Trivy scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: ${{ inputs.scan-type }}
+        scan-ref: ${{ inputs.path }}
+        format: ${{ inputs.format }}
+        output: ${{ inputs.sarif-file }}
+        scanners: ${{ inputs.scanners }}
+        severity: ${{ inputs.severity }}
+        exit-code: ${{ inputs.exit-code }}
+        hide-progress: true
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif-file }}

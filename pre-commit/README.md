@@ -122,3 +122,7 @@ jobs:
 `repo-token`
 Optional. Uses to comment on PRs. Example: `repo-token: ${{ secrets.GITHUB_TOKEN }}`
 
+`path`
+Optional. Working directory where pre-commit should run.
+Default: `.`
+
