@@ -1,6 +1,8 @@
 # GitHub Actions: Run Tflint
 GitHub Action for running tflint.
 
+> Note: if you want SARIF-based security scanning that supports newer Terraform syntax (including provider namespaced functions), use `dasmeta/reusable-actions-workflows/trivy@main`.
+
 ## Usage
 
 This action can be used as follows add latest version:
