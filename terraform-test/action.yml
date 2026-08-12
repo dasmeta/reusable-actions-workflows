@@ -20,13 +20,17 @@ inputs:
     description: "AWS Secret Access Key. This input is required if running in the GitHub hosted environment."
     required: false
   path:
-    description: "Path where to run terraform test"
+    description: "Path where to run terraform test, relative to the repository root"
     required: false
-    default: /
+    default: .
+  backend:
+    description: "Disable or Enable Backend during init. Module test repositories normally keep this false."
+    required: false
+    default: "false"
   terraform_version:
-    description: "Terraform version used in this action"
+    description: "Terraform version used in this action. Must be >= 1.6 for the native test framework (.tftest.hcl files)."
     required: false
-    default: 1.3.6
+    default: 1.9.8
 
 runs:
   using: "composite"
@@ -50,14 +54,45 @@ runs:
 
     - name: Check for tests folder
       run: |
-        if [ ! -d "${{ inputs.path }}/tests" ]; then
+        tests_dir="${{ inputs.path }}/tests"
+
+        if [ ! -d "$tests_dir" ]; then
           echo "Tests folder not found for ${{ inputs.path }}, exiting pipeline"
           exit 1
         fi
+
+        # `terraform test` discovers *.tftest.hcl in the test directory only; it
+        # does not recurse. Test files nested one level deeper are silently never
+        # executed, which reports success over an empty set. Fail loudly instead.
+        discovered="$(find "$tests_dir" -maxdepth 1 -name '*.tftest.hcl' | wc -l | tr -d ' ')"
+        nested="$(find "$tests_dir" -mindepth 2 -name '*.tftest.hcl' | wc -l | tr -d ' ')"
+
+        if [ "$discovered" -eq 0 ]; then
+          echo "No *.tftest.hcl files found directly in $tests_dir"
+          if [ "$nested" -gt 0 ]; then
+            echo "Found $nested nested test file(s) that 'terraform test' will never discover:"
+            find "$tests_dir" -mindepth 2 -name '*.tftest.hcl'
+            echo "Move them directly into $tests_dir."
+          fi
+          exit 1
+        fi
+
+        if [ "$nested" -gt 0 ]; then
+          echo "::warning::Found $nested nested *.tftest.hcl file(s) under $tests_dir that will not be executed."
+        fi
+
+        echo "Discovered $discovered test file(s) in $tests_dir"
+      shell: bash
+
+    - name: Initialize Terraform
+      if: ${{ success() }}
+      run: |
+        cd ${{ inputs.path }}
+        terraform init -backend="${{ inputs.backend }}"
       shell: bash
 
     - name: Run Terraform Test
-      if: ${{ success() }} 
+      if: ${{ success() }}
       run: |
         cd ${{ inputs.path }}
         terraform test
