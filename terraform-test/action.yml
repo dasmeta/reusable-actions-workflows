@@ -40,7 +40,11 @@ runs:
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
 
+    # Skipped when no credentials are supplied. Modules that use a non-AWS
+    # provider have no reason to configure AWS, and running this step with
+    # absent or invalid credentials fails the whole job before Terraform runs.
     - name: Configure AWS Credentials
+      if: ${{ inputs.aws-access-key-id != '' && inputs.aws-secret-access-key != '' }}
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-region: ${{ inputs.aws-region }}

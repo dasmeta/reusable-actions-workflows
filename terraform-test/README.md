@@ -70,7 +70,11 @@ Optional. 'AWS Region, e.g. us-east-2'
 Optional. AWS Access Key ID. This input is required if running in the GitHub hosted environment.
 
 `aws-secret-access-key`
-Optional. AWS Secret Access Key. This input is required if running in the GitHub hosted environment.
+Optional. AWS Secret Access Key. Required only when the module under test uses
+AWS. When `aws-access-key-id` and `aws-secret-access-key` are both empty, the
+AWS credential step is skipped entirely — modules using a non-AWS provider
+should omit them rather than passing unused or invalid values, which would fail
+the job before Terraform runs.
 
 `path`
 Optional. Path where to run terraform test, relative to the repository root.
@@ -88,7 +92,8 @@ test framework.
 
 ## Behavior
 
-1. Checks out the repository and configures AWS credentials.
+1. Checks out the repository, and configures AWS credentials only when both AWS
+   key inputs are supplied.
 2. Installs the requested Terraform version.
 3. Verifies `<path>/tests` exists and contains at least one discoverable
    `*.tftest.hcl` file, failing with guidance when test files are nested.
