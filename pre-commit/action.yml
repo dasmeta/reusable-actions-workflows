@@ -12,58 +12,131 @@ inputs:
     description: "path"
     required: false
     default: .
+  terraform-docs-version:
+    description: >-
+      terraform-docs release to install, without the leading v. Generated
+      documentation differs between terraform-docs versions, so CI and local
+      hooks must agree on one version or every machine produces a different
+      README.
+    required: false
+    default: "0.20.0"
+  terraform-version:
+    description: "Terraform version installed for hooks that shell out to terraform."
+    required: false
+    default: "1.9.8"
+  scope:
+    description: >-
+      Which files to check. "all" runs every hook over the whole repository.
+      "changed" runs them only over files touched between base-ref and HEAD,
+      which is what a pull request usually wants.
+    required: false
+    default: all
+  base-ref:
+    description: >-
+      Base git ref used when scope is "changed". Defaults to the pull request
+      base branch when the workflow runs on a pull request.
+    required: false
+    default: ""
+  comment:
+    description: "Post the hook output as a pull request comment."
+    required: false
+    default: "true"
+  fail-on-error:
+    description: >-
+      Fail the step when a hook fails. Defaults to true, so a required check
+      built on this action is a real gate. Set to false only for advisory runs.
+    required: false
+    default: "true"
+  aws-access-key-id:
+    description: "Deprecated and unused. Accepted so existing callers keep working."
+    required: false
+  aws-secret-access-key:
+    description: "Deprecated and unused. Accepted so existing callers keep working."
+    required: false
+
 runs:
   using: composite
   steps:
   - name: Check out code
-    uses: actions/checkout@v3
+    uses: actions/checkout@v4
     with:
       fetch-depth: 0
-      
+
   - run: python -m pip install pre-commit
     shell: bash
   - run: python -m pip freeze --local
     shell: bash
-  - run: |
-        curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
-        tar -xzf terraform-docs.tar.gz
-        chmod +x terraform-docs
-        sudo mv terraform-docs /usr/bin/terraform-docs
+
+  # Pinned rather than "latest": terraform-docs changes its rendering between
+  # releases, so an unpinned install makes CI disagree with local hooks and
+  # every README looks out of date on somebody's machine.
+  - name: Install terraform-docs
+    run: |
+      version="${{ inputs.terraform-docs-version }}"
+      curl -sSLo ./terraform-docs.tar.gz \
+        "https://terraform-docs.io/dl/v${version}/terraform-docs-v${version}-$(uname)-amd64.tar.gz"
+      tar -xzf terraform-docs.tar.gz terraform-docs LICENSE README.md 2>/dev/null || tar -xzf terraform-docs.tar.gz
+      chmod +x terraform-docs
+      sudo mv terraform-docs /usr/bin/terraform-docs
+      terraform-docs --version
     shell: bash
+
   - name: Setup Terraform
-    uses: hashicorp/setup-terraform@v2
+    uses: hashicorp/setup-terraform@v3
     with:
-      terraform_version: 1.2.1
-  - uses: actions/cache@v3
+      terraform_version: ${{ inputs.terraform-version }}
+      terraform_wrapper: false
+
+  - uses: actions/cache@v4
     with:
       path: ~/.cache/pre-commit
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-  - run: |
-      WORKDIR="${{ inputs.path }}"
-      cd "$WORKDIR"
-      touch results.txt
-      pre-commit run -a | sed -E 's/^([[:space:]]+)([-+])/\2\1/g' > results.txt
-    shell: bash
-    continue-on-error: true
-    
-  - name: Put Files in ENV Vars
-    run: |
-      WORKDIR="${{ inputs.path }}"
-      cd "$WORKDIR"
-      RESULT=$(cat results.txt)
-      echo "RESULT<<EOF" >> $GITHUB_ENV
-      echo "$RESULT" >> $GITHUB_ENV
-      echo "EOF" >> $GITHUB_ENV
-    shell: bash
-    continue-on-error: true
 
-  - name: check if pre-commit run has errors
-    run: echo ${{ env.RESULT }} | grep -q "Failed"
+  # The run is deliberately allowed to fail here: the output has to be captured
+  # and posted to the pull request before the step that fails the job. The exit
+  # code is carried forward as a step output instead of being discarded.
+  - name: Run pre-commit
+    id: run
+    run: |
+      set +e
+      WORKDIR="${{ inputs.path }}"
+      cd "$WORKDIR"
+
+      if [ "${{ inputs.scope }}" = "changed" ]; then
+        base="${{ inputs.base-ref }}"
+        if [ -z "${base}" ]; then
+          base="${{ github.event.pull_request.base.sha }}"
+        fi
+
+        if [ -z "${base}" ]; then
+          echo "scope=changed needs a base ref; falling back to the whole repository"
+          pre-commit run --show-diff-on-failure --color=always --all-files > results.txt 2>&1
+        else
+          echo "checking files changed since ${base}"
+          pre-commit run --show-diff-on-failure --color=always \
+            --from-ref "${base}" --to-ref HEAD > results.txt 2>&1
+        fi
+      else
+        pre-commit run --show-diff-on-failure --color=always --all-files > results.txt 2>&1
+      fi
+
+      code=$?
+      set -e
+
+      sed -i -E 's/^([[:space:]]+)([-+])/\2\1/g' results.txt
+      cat results.txt
+
+      echo "exit-code=${code}" >> "$GITHUB_OUTPUT"
+
+      {
+        echo "RESULT<<PRE_COMMIT_EOF"
+        cat results.txt
+        echo "PRE_COMMIT_EOF"
+      } >> "$GITHUB_ENV"
     shell: bash
-    continue-on-error: true
 
   - name: Post to GitHub PR
-    if: ${{ success() }} 
+    if: ${{ inputs.comment == 'true' && inputs.repo-token != '' && github.event_name == 'pull_request' }}
     uses: mshick/add-pr-comment@v1
     with:
       repo-token: ${{ inputs.repo-token }}
@@ -74,3 +147,18 @@ runs:
           ```diff
           ${{ env.RESULT }}
           ```
+
+  # Previously both this step and the run itself carried continue-on-error, and
+  # the check was `grep -q Failed`, which succeeds when hooks fail. The job
+  # therefore reported success no matter what, so any required status check
+  # built on it was decorative. Fail on the real exit code instead.
+  - name: Fail when a hook failed
+    if: ${{ inputs.fail-on-error == 'true' }}
+    run: |
+      code="${{ steps.run.outputs.exit-code }}"
+      if [ "${code}" != "0" ]; then
+        echo "pre-commit exited with ${code}"
+        exit "${code}"
+      fi
+      echo "all hooks passed"
+    shell: bash
