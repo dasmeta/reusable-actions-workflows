@@ -18,6 +18,17 @@ inputs:
       documentation differs between terraform-docs versions, so CI and local
       hooks must agree on one version or every machine produces a different
       README.
+
+      Defaults to 0.20.0 because that is what the committed documentation
+      across the managed repositories already matches: they use <br/> in
+      <pre> type blocks, which 0.16.0 does not emit, and tight |------|
+      table separators, which 0.24.0 reflows to | ---- |. Pinning 0.20.0
+      is therefore a near no-op, while 0.24.0 would rewrite the separator
+      row of every table in roughly 900 files for no semantic gain.
+
+      Worth knowing when bumping this: CI installed 0.16.0 while the
+      committed docs were 0.20.0-shaped, so every run wanted to rewrite
+      <br/> back to <br>. Nobody saw it because the job could not fail.
     required: false
     default: "0.20.0"
   terraform-version:
