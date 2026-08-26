@@ -119,10 +119,33 @@ jobs:
 ```
 ## Valid INPUTS
 
-`repo-token`
-Optional. Uses to comment on PRs. Example: `repo-token: ${{ secrets.GITHUB_TOKEN }}`
+| Input | Default | Purpose |
+|---|---|---|
+| `repo-token` | — | Token used to comment on the pull request. Usually `${{ secrets.GITHUB_TOKEN }}`. |
+| `path` | `.` | Working directory the hooks run in. |
+| `terraform-docs-version` | `0.20.0` | terraform-docs release to install, no leading `v`. |
+| `terraform-version` | `1.9.8` | Terraform installed for hooks that shell out to it. |
+| `scope` | `all` | `all` checks the whole repository, `changed` only files touched since `base-ref`. |
+| `base-ref` | pull request base | Base ref used when `scope: changed`. |
+| `comment` | `true` | Post the hook output as a pull request comment. |
+| `fail-on-error` | `true` | Fail the step when a hook fails. |
+| `aws-access-key-id` | — | Deprecated and unused, accepted so existing callers keep working. |
+| `aws-secret-access-key` | — | Deprecated and unused, accepted so existing callers keep working. |
 
-`path`
-Optional. Working directory where pre-commit should run.
-Default: `.`
+## Behaviour Notes
 
+**This action fails when a hook fails.** Before 4.4.0 it could not: `continue-on-error`
+sat on both the run step and the check step, and the check itself was
+`grep -q "Failed"`, which *succeeds* when hooks fail. Any required status check
+built on it was decorative. If you relied on the old advisory behaviour, set
+`fail-on-error: false` explicitly.
+
+**terraform-docs is pinned.** Generated documentation differs between
+terraform-docs releases, so an unpinned install makes CI disagree with local
+hooks and every README looks out of date on somebody's machine. Pin the same
+version in your local setup as the one this action installs.
+
+**Scoping to changed files.** `scope: changed` runs hooks only over files touched
+since the base ref, which keeps a pull request from being judged on unrelated
+parts of the repository. It falls back to a full run when no base ref can be
+determined, so a `push` build still checks everything.
